@@ -1,10 +1,13 @@
 import java.lang.Math;
 import java.util.Random;
+
 //2d grid, sidelength 20
-protected class Cell {
+class Cell {
     private double sugar = 10.0;//initial value for sugar
     private boolean occupied = false;
-    private double regenRate = 1.0;
+    private Agent occupier;
+    public boolean isCorpse = false;
+    private double regenRate = 0.0;
     protected Cell(double regenRate, boolean occupied, double sugar) {
         this.regenRate = regenRate;
         this.occupied = occupied;
@@ -14,7 +17,7 @@ protected class Cell {
         this.occupied = occupied;
         this.sugar = sugar;
     }
-    protected Cell(boolean occupied) {
+    public Cell(boolean occupied) {
         this.occupied = occupied;
     }
     protected Cell(double regenRate, boolean occupied) {
@@ -32,12 +35,25 @@ protected class Cell {
         sugar = 0;
         return tempSugar;
     }
-    public setOccupied(boolean occupied){
+    public void setOccupied(boolean occupied, Agent occupier){
         this.occupied = occupied;
+        this.occupier = occupier;
+    }
+    public void setOccupied(boolean occupied){
+        assert(occupied == false);
+        this.occupied = occupied;
+        this.occupier = null;
     }
     public void doTick(){
         if(!occupied){
             this.sugar = Math.min(10.0, this.sugar+regenRate);
+        }
+        if(occupied){
+            if(occupier.isDying){
+                isCorpse = true;
+            }else{
+                isCorpse = false;
+            }
         }
     }
 }
@@ -45,15 +61,15 @@ protected class Cell {
 public class Grid {
     private final int w;
     private final int h;
-    private Cell[][] map;
-    private Cell generateMap(){
-        for(Cell[] a : map){
-            for(Cell cell : a){
-                cell = new Cell(false);
+    public Cell[][] map;
+    private void generateMap(){
+        for(int x=0;x<w;x++){
+            for(int y=0;y<h;y++){
+                map[x][y] = new Cell(false);
             }
         }
     }
-    public static Grid(int width, int height){
+    public Grid(int width, int height){
         w = width; h = height; this.map = new Cell[w][h]; generateMap();
     }
     public void doTick(){
@@ -62,5 +78,29 @@ public class Grid {
                 cell.doTick();
             }
         }
+    }
+    public void addAgent(Agent agent){
+        map[agent.x][agent.y].setOccupied(true, agent);
+    }
+    public Pixel[][] toData(){
+        Pixel[][] newData = new Pixel[w][h];
+        for(int x=0;x<w;x++){
+            for(int y=0;y<h;y++){
+                Cell cell = map[x][y];
+                if(cell.getOccupied()){
+                    if(cell.isCorpse){
+                        newData[x][y] = new Pixel(new int[]{255,0,0});
+                    }else{
+                        newData[x][y] = new Pixel(new int[]{0,255,0});
+                    }
+                }else if(cell.getSugar() > 1.0){
+                    newData[x][y] = new Pixel((int) (Math.round(25*cell.getSugar())));
+                }else{
+                    newData[x][y] = new Pixel(0);
+                }
+
+            }
+        }
+        return newData;
     }
 }
