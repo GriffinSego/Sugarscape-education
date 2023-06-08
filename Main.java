@@ -2,9 +2,11 @@ import java.util.ArrayList;
 
 //main.java
 public class Main {
+
     public static void main(String[] args){
         ArrayList<Agent> livingAgents = new ArrayList<Agent>();
         ArrayList<Agent> deadAgents = new ArrayList<Agent>();
+
         Grid a = new Grid(Config.gridWidth,Config.gridHeight);
         Visual v = new Visual(a.toData());
         int desiredAgents = Config.desiredNumOfAgents;
@@ -18,10 +20,14 @@ public class Main {
         int tick = 0;
         while(alive){
             a.doTick();
+            //System.out.println("clearing labels");
+
             for(Agent agent : livingAgents){
                 agent.doTick(a.map);
-                System.out.println("agent doTick");
+                Visual.labels.add(new Label(agent.x, agent.y-2, agent.name));
+                //System.out.println("agent doTick");
             }
+            System.out.println("label length"+Visual.labels.size());
             ArrayList<Agent> dyingAgents = new ArrayList<Agent>();
             for(Agent agent : livingAgents){
                 if(agent.isDying){
@@ -42,7 +48,7 @@ public class Main {
             v.updateData(a.toData());
             v.repaint();
             try{
-                Thread.sleep(1);
+                Thread.sleep(Config.simulationSpeed);
             } catch(Exception e){}
         }
 
