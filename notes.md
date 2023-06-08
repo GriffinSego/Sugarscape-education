@@ -9,8 +9,8 @@
     + One agent created at origin at map generation
     + Terminate program if all agents are dead
     + Vision 360deg (can be circle or square, take radius as parameter)
-    - Several agents spawn
+    + Several agents spawn
     - Take stats of agents and print at process close (Lifetime, max sugar, death location)
     - Fix window scaling with grid size change
-    - Consolidate constants and defaults into config
+    + Consolidate constants and defaults into config
 * Read book

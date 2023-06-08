@@ -5,13 +5,16 @@ public class Main {
     public static void main(String[] args){
         ArrayList<Agent> livingAgents = new ArrayList<Agent>();
         ArrayList<Agent> deadAgents = new ArrayList<Agent>();
-        Grid a = new Grid(200,200);
+        Grid a = new Grid(Config.gridWidth,Config.gridHeight);
         Visual v = new Visual(a.toData());
-        Agent bob = new Agent(3,5,5);
-        a.addAgent(bob);
-        livingAgents.add(bob);
+        int desiredAgents = Config.desiredNumOfAgents;
+        for(int i = 0; i < desiredAgents; i++){
+            Agent temp = new Agent(3,i,i);
+            a.addAgent(temp);
+            livingAgents.add(temp);
+        }
         boolean alive = true;
-        int maxTicks = 50000;
+        int maxTicks = Config.maxTicks;
         int tick = 0;
         while(alive){
             a.doTick();
@@ -31,7 +34,7 @@ public class Main {
             tick++;
             if(tick>maxTicks || livingAgents.size() == 0){
                 try{
-                    Thread.sleep(1500);
+                    Thread.sleep(Config.windowRemainOpenTimeAfterDeath);
                 } catch(Exception e){}
                 System.exit(0);
                 break;

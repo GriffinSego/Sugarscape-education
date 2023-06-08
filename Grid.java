@@ -3,11 +3,11 @@ import java.util.Random;
 
 //2d grid, sidelength 20
 class Cell {
-    private double sugar = 10.0;//initial value for sugar
+    private double sugar = Config.initialSugarValuePerTile;//initial value for sugar
     private boolean occupied = false;
     private Agent occupier;
     public boolean isCorpse = false;
-    private double regenRate = 0.0;
+    private double regenRate = Config.regenRate;
     protected Cell(double regenRate, boolean occupied, double sugar) {
         this.regenRate = regenRate;
         this.occupied = occupied;
@@ -46,7 +46,7 @@ class Cell {
     }
     public void doTick(){
         if(!occupied){
-            this.sugar = Math.min(10.0, this.sugar+regenRate);
+            this.sugar = Math.min(Config.MAX_SUGAR, this.sugar+regenRate);
         }
         if(occupied){
             if(occupier.isDying){

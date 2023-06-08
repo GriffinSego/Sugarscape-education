@@ -14,8 +14,8 @@ class Pixel {
 
 public class Visual extends JPanel {
     private Pixel[][] data;
-    private int x = 500;
-    private int y = 500;
+    private int x = Config.windowWidth;
+    private int y = Config.windowHeight;
     public Visual(Pixel[][] data){
         this.data = data;
         SwingUtilities.invokeLater(() -> {

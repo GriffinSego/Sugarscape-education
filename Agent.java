@@ -2,8 +2,9 @@ public class Agent {
     public int x;
     public int y;
     private int range;
-    private double hunger = 5.0;
-    public boolean isDying = false;
+    private double hunger = Config.defaultHunger;
+    public boolean isDying = Config.allAgentsImmediatelyDieUponSpawning;
+    public boolean isBlind = Config.allAgentsBlind;
     public Agent(int range, int x, int y){
         this.range = range;
         this.x = x;
@@ -16,7 +17,7 @@ public class Agent {
     }
     public boolean doTick(Cell[][] map){
         //hunger tick, look, move, eat, hunger check
-        hunger -= 5.0;
+        hunger -= Config.rateOfMetabolism;
         int[] mostSugar = new int[2];
         double mostSugarValue = 0.0;
         for(int i=x-range;i>x+range;i++){
@@ -28,19 +29,22 @@ public class Agent {
                 }
             }
         }
-        if(mostSugarValue == 0.0){
-            //move in a random direction
-            System.out.println("random dir");
-            map[x][y].setOccupied(false);
-            int xoffset = (int) Math.round(Math.random()*2)-1;
-            int yoffset = (int) Math.round(Math.random()*2)-1;
-            while(x+xoffset<0 || y+yoffset < 0 || x+xoffset > map.length-1 || y+yoffset > map[1].length-1){
-                xoffset = (int) Math.round(Math.random()*2)-1;
-                yoffset = (int) Math.round(Math.random()*2)-1;
+        if(mostSugarValue == 0.0 || isBlind){
+            if(Config.agentsCanMove){
+                //move in a random direction
+                System.out.println("random dir");
+                map[x][y].setOccupied(false);
+                int xoffset = (int) Math.round(Math.random()*2)-1;
+                int yoffset = (int) Math.round(Math.random()*2)-1;
+                while(x+xoffset<0 || y+yoffset < 0 || x+xoffset > map.length-1 || y+yoffset > map[1].length-1){
+                    xoffset = (int) Math.round(Math.random()*2)-1;
+                    yoffset = (int) Math.round(Math.random()*2)-1;
+                }
+                x += xoffset;
+                y += yoffset;
+                map[x][y].setOccupied(true, this);
+
             }
-            x += xoffset;
-            y += yoffset;
-            map[x][y].setOccupied(true, this);
             hunger += map[x][y].eatSugar();
         }else{
 
