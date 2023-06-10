@@ -13,9 +13,9 @@
     ~ Take stats of agents and print at process close (Lifetime, max sugar, death location)
     + Fix window scaling with grid size change
     + Consolidate constants and defaults into config
-    - Set max cell sugar based on 2d noise func
-    - Randomized arrays for immune string and culture strings/arrays
-    - Default lengths for the immune string and culture array should be settable from the config
+    x !Not sure how to access simplex noise as a library! Set max cell sugar based on 2d noise func
+    + Randomized arrays for immune string and culture strings/arrays
+    + Default lengths for the immune string and culture array should be settable from the config
     - Keep track of recently seen agents (ArrayList per-agent of last seen people)
     - Comparing boolean arrays and finding distance between them, and location of smallest distance between them
     - Ondeath: Sugar in reserves is dumped on their current tile

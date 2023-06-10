@@ -1,4 +1,5 @@
 import java.util.Random;
+import java.util.ArrayList;
 
 public class Agent {
     public int x;
@@ -12,8 +13,12 @@ public class Agent {
     private double sugarConsumed = 0;
     private double maxSugar = hunger;
     Random random = new Random();
-    private boolean[] immuneSystem = new boolean[1];
-    private boolean[] culture = new boolean[1];
+    private boolean[] immuneSystem = new boolean[Config.immuneSystemlen];
+    private boolean[] culture = new boolean[Config.culturelen];
+    private ArrayList<Agent> recentlySeenAgents = new ArrayList<Agent>();
+    public boolean coin(){
+        return (true == (random.nextDouble() < 0.5));
+    }
     public String randomConsonant() {
         char[] consonants = {'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n',
                              'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z'};
@@ -40,19 +45,31 @@ public class Agent {
     private void generateName(){
         this.name = randomConsonant().toUpperCase()+randomVowel()+randomConsonant();
     };
+    private boolean[] generateRandomBinaryString(int length){
+        boolean[] binaryString = new boolean[length];
+        for(int i=0; i<length; i++){
+            binaryString[i] = coin();
+        }
+        System.out.println(binaryString[0]);
+        return binaryString;
+    }
+    // public void distanceBetweenBinaryStrings(ArrayList<boolean> 1, ArrayList<boolean> 2){
+    //     1+1;
+    //     //return
+    // }
     public Agent(int range, int x, int y){
-        this.immuneSystem[0] = ((random.nextDouble() < 0.5 ? 1 : 0) == 1);
-        this.culture[0] = ((random.nextDouble() < 0.5 ? 1 : 0) == 1);
         this.range = range;
         this.x = x;
         this.y = y;
         generateName();
-
+        this.culture = generateRandomBinaryString(Config.culturelen);
+        this.immuneSystem = generateRandomBinaryString(Config.immuneSystemlen);
     }
     public Agent(int range){
         this.range = range;
         this.x = 0;
         this.y = 0;
+        generateName();
     }
     public boolean doTick(Cell[][] map){
         if(!isDying){
@@ -63,6 +80,7 @@ public class Agent {
         }
         //hunger tick, look, move, eat, hunger check
         hunger -= Config.rateOfMetabolism;
+        System.out.println("hunger is "+hunger);
         int[] mostSugar = new int[2];
         double mostSugarValue = 0.0;
         for(int i=x-range;i>x+range;i++){

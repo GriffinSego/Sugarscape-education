@@ -1,5 +1,6 @@
 import java.lang.Math;
 import java.util.Random;
+import java.awt.Color;
 
 //2d grid, sidelength 20
 class Cell {
@@ -7,7 +8,12 @@ class Cell {
     private boolean occupied = false;
     private Agent occupier;
     public boolean isCorpse = false;
+    private int x;
+    private int y;
     private double regenRate = Config.regenRate;
+    private static SimplexNoise simplex = new SimplexNoise(100l);
+    private double noise;
+    private double maxNoise;
     protected Cell(double regenRate, boolean occupied, double sugar) {
         this.regenRate = regenRate;
         this.occupied = occupied;
@@ -17,8 +23,12 @@ class Cell {
         this.occupied = occupied;
         this.sugar = sugar;
     }
-    public Cell(boolean occupied) {
+    public Cell(boolean occupied, int x, int y) {
         this.occupied = occupied;
+        this.x = x;
+        this.y = y;
+        noise = simplex.noise((double) x, (double) y);
+        maxNoise = Math.max(0,(noise*Config.MAX_SUGAR)-(0.3*Config.MAX_SUGAR));
     }
     protected Cell(double regenRate, boolean occupied) {
         this.regenRate = regenRate;
@@ -46,7 +56,7 @@ class Cell {
     }
     public void doTick(){
         if(!occupied){
-            this.sugar = Math.min(Config.MAX_SUGAR, this.sugar+regenRate);
+            this.sugar = Math.min(maxNoise, this.sugar+regenRate);
         }
         if(occupied){
             if(occupier.isDying){
@@ -65,7 +75,7 @@ public class Grid {
     private void generateMap(){
         for(int x=0;x<w;x++){
             for(int y=0;y<h;y++){
-                map[x][y] = new Cell(false);
+                map[x][y] = new Cell(false, x, y);
             }
         }
     }
@@ -89,9 +99,9 @@ public class Grid {
                 Cell cell = map[x][y];
                 if(cell.getOccupied()){
                     if(cell.isCorpse){
-                        newData[x][y] = new Pixel(new int[]{255,0,0});
+                        newData[x][y] = new Pixel(new Color(255,0,0));
                     }else{
-                        newData[x][y] = new Pixel(new int[]{0,255,0});
+                        newData[x][y] = new Pixel(new Color(0,255,0));
                     }
                 }else if(cell.getSugar() > 1.0){
                     newData[x][y] = new Pixel((int) (Math.round(25*cell.getSugar())));

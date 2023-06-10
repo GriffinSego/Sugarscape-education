@@ -10,24 +10,29 @@ public class Main {
         Grid a = new Grid(Config.gridWidth,Config.gridHeight);
         Visual v = new Visual(a.toData());
         int desiredAgents = Config.desiredNumOfAgents;
-        for(int i = 0; i < desiredAgents; i++){
-            Agent temp = new Agent(3,i,i);
+        for(int i = 0; i <= desiredAgents; i++){
+            Agent temp = new Agent(3,i+((int) Math.round(Config.gridWidth*0.5)),i+((int) Math.round(Config.gridHeight*0.5)));
             a.addAgent(temp);
             livingAgents.add(temp);
         }
         boolean alive = true;
         int maxTicks = Config.maxTicks;
         int tick = 0;
+
+        for(Agent agent : livingAgents){
+            Visual.labels.add(new AgentLabel(agent));
+        }
+
         while(alive){
             a.doTick();
             //System.out.println("clearing labels");
 
             for(Agent agent : livingAgents){
                 agent.doTick(a.map);
-                Visual.labels.add(new Label(agent.x, agent.y-2, agent.name));
+
                 //System.out.println("agent doTick");
             }
-            System.out.println("label length"+Visual.labels.size());
+
             ArrayList<Agent> dyingAgents = new ArrayList<Agent>();
             for(Agent agent : livingAgents){
                 if(agent.isDying){
@@ -39,6 +44,7 @@ public class Main {
             livingAgents.removeAll(dyingAgents);
             tick++;
             if(tick>maxTicks || livingAgents.size() == 0){
+                System.out.println("game ending, all agents dead or time ran out");
                 try{
                     Thread.sleep(Config.windowRemainOpenTimeAfterDeath);
                 } catch(Exception e){}
