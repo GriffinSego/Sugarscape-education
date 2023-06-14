@@ -123,7 +123,6 @@ public class Grid {
                 }else{
                     newData[x][y] = new Pixel(0);
                 }
-
             }
         }
         return newData;
