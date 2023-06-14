@@ -67,9 +67,9 @@ public class Visual extends JPanel {
             l.updateLabel();
             //System.out.println("drawing label");
             g.setColor(Config.labelBgColor);
-            g.fillRect(round(d(l.x)*segmentWidth), round(d(l.y)*segmentHeight)-20, 40, 20);
+            g.fillRect(round(d(l.x)*segmentWidth), round(d(l.y)*segmentHeight)-28, 25, 15);
             g.setColor(Config.labelTextColor);
-            g.drawString(l.text, round(d(l.x)*segmentWidth), round(d(l.y)*segmentHeight));
+            g.drawString(l.text, round(d(l.x)*segmentWidth), round(d(l.y)*segmentHeight)-16);
         }
         //labels.clear();
     }

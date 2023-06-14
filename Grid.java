@@ -1,12 +1,13 @@
 import java.lang.Math;
 import java.util.Random;
+import java.util.ArrayList;
 import java.awt.Color;
 
 //2d grid, sidelength 20
 class Cell {
     private double sugar = Config.initialSugarValuePerTile;//initial value for sugar
-    private boolean occupied = false;
-    private Agent occupier;
+    public boolean occupied = false;
+    public Agent occupier;
     public boolean isCorpse = false;
     private int x;
     private int y;
@@ -40,6 +41,9 @@ class Cell {
     public double getSugar(){
         return sugar;
     }
+    public void setSugar(double newSugar){
+        sugar = newSugar;
+    }
     public double eatSugar(){
         double tempSugar = sugar;
         sugar = 0;
@@ -69,6 +73,8 @@ class Cell {
 }
 //A 2d grid of Cell to hold the sugar values of the map
 public class Grid {
+    public static ArrayList<Agent> livingAgents;
+    public static ArrayList<Agent> deadAgents;
     private final int w;
     private final int h;
     public Cell[][] map;
@@ -80,7 +86,9 @@ public class Grid {
         }
     }
     public Grid(int width, int height){
-        w = width; h = height; this.map = new Cell[w][h]; generateMap();
+        livingAgents = new ArrayList<Agent>();
+        deadAgents = new ArrayList<Agent>();
+        w = width; h = height; map = new Cell[w][h]; generateMap();
     }
     public void doTick(){
         for(Cell[] a : map){
@@ -89,8 +97,15 @@ public class Grid {
             }
         }
     }
+    public static void updateLabels(){
+        for(Agent agent : Grid.livingAgents){
+            Visual.labels.add(new AgentLabel(agent));
+        }
+    }
     public void addAgent(Agent agent){
         map[agent.x][agent.y].setOccupied(true, agent);
+        livingAgents.add(agent);
+        updateLabels();
     }
     public Pixel[][] toData(){
         Pixel[][] newData = new Pixel[w][h];
