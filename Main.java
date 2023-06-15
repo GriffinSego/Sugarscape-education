@@ -2,47 +2,48 @@ import java.util.ArrayList;
 
 //main.java
 public class Main {
-    public static Grid theGrid;
-    public static void main(String[] args){
-        theGrid = new Grid(Config.gridWidth,Config.gridHeight);
-        Visual v = new Visual(theGrid.toData());
-        int desiredAgents = Config.desiredNumOfAgents;
-        for(int i = 0; i <= desiredAgents; i++){
+    //main admin methods
+    public static void checkEndstate(){
+        if(tick>Config.maxTicks || !theGrid.survivors){
+            System.out.println("game ending, all agents dead or time ran out");
+            try{
+                Thread.sleep(Config.windowRemainOpenTimeAfterDeath);
+            } catch(Exception e){}
+            System.exit(0);
+        }
+    }
+    private static void spawnAgents(){
+        for(int i = 0; i <= Config.desiredNumOfAgents; i++){
             Agent temp = new Agent(i+((int) Math.round(Config.gridWidth*0.5)),i+((int) Math.round(Config.gridHeight*0.5)), theGrid);
             theGrid.addAgent(temp);
         }
+    }
+    private static void tickSleep(){
+        try{
+            Thread.sleep(Config.simulationSpeed);
+        } catch(Exception e){}
+    }
+    //main public variable declarations (only accessible outside of Main.java through passed references)
+    public static int tick;
+    public static Grid theGrid;
+    public static Visual visuals;
+    public static void main(String[] args){//execution flow
+        //instantiate gamespace grid and graphic handler
+        theGrid = new Grid(Config.gridWidth,Config.gridHeight);
+        visuals = new Visual(theGrid.toImageData());
+        //tickloop setup
         boolean alive = true;
-        int maxTicks = Config.maxTicks;
-        int tick = 0;
-        while(alive){
-            theGrid.doTick();
-            for(Agent agent : Grid.livingAgents){
-                agent.doTick();
-            }
-
-            ArrayList<Agent> dyingAgents = new ArrayList<Agent>();
-            for(Agent agent : Grid.livingAgents){
-                if(agent.isDying){
-                    dyingAgents.add(agent);
-                    agent.die(theGrid);
-                }
-            }
-            Grid.deadAgents.addAll(dyingAgents);
-            Grid.livingAgents.removeAll(dyingAgents);
+        spawnAgents();
+        tick = 0;
+        while(alive){//tickloop
             tick++;
-            if(tick>maxTicks || Grid.livingAgents.size() == 0){
-                System.out.println("game ending, all agents dead or time ran out");
-                try{
-                    Thread.sleep(Config.windowRemainOpenTimeAfterDeath);
-                } catch(Exception e){}
-                System.exit(0);
-                break;
-            }
-            v.updateData(theGrid.toData());
-            v.repaint();
-            try{
-                Thread.sleep(Config.simulationSpeed);
-            } catch(Exception e){}
+            theGrid.doTick();
+            visuals.updateData(theGrid.toImageData());
+            visuals.repaint();
+
+            //clean up and reconcile changes from tick cycle
+            checkEndstate();
+            tickSleep();
         }
     }
 }

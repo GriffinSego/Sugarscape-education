@@ -24,7 +24,6 @@ public class Visual extends JPanel {
     private Pixel[][] data;
     private int x = Config.windowWidth;
     private int y = Config.windowHeight;
-    public static ArrayList<AgentLabel> labels = new ArrayList<AgentLabel>();
     private double segmentWidth = ((double) Config.windowWidth/(double) Config.gridWidth);
     private double segmentHeight = ((double) Config.windowHeight/(double) Config.gridHeight);
 
@@ -62,16 +61,12 @@ public class Visual extends JPanel {
             }
         }
 
-        //System.out.println("labels size from vis"+labels.size());
-        for(AgentLabel l : labels){
-            l.updateLabel();
-            //System.out.println("drawing label");
+        for(Agent a : Grid.livingAgents){
             g.setColor(Config.labelBgColor);
-            g.fillRect(round(d(l.x)*segmentWidth), round(d(l.y)*segmentHeight)-28, 25, 15);
+            g.fillRect(round(d(a.x)*segmentWidth), round(d(a.y)*segmentHeight)-28, 25, 15);
             g.setColor(Config.labelTextColor);
-            g.drawString(l.text, round(d(l.x)*segmentWidth), round(d(l.y)*segmentHeight)-16);
+            g.drawString(a.name, round(d(a.x)*segmentWidth), round(d(a.y)*segmentHeight)-16);
         }
-        //labels.clear();
     }
     public void updateData(Pixel[][] data){
         this.data = data;
