@@ -6,6 +6,8 @@ public class Main {
     public static void checkEndstate(){
         if(tick>Config.maxTicks || !theGrid.survivors){
             System.out.println("game ending, all agents dead or time ran out");
+            System.out.println("living agents: "+theGrid.livingAgents);
+            System.out.println("dying agents: "+theGrid.deadAgents);
             try{
                 Thread.sleep(Config.windowRemainOpenTimeAfterDeath);
             } catch(Exception e){}
@@ -13,7 +15,7 @@ public class Main {
         }
     }
     private static void spawnAgents(){
-        for(int i = 0; i <= Config.desiredNumOfAgents; i++){
+        for(int i = 0; i < Config.desiredNumOfAgents; i++){
             Agent temp = new Agent(i+((int) Math.round(Config.gridWidth*0.5)),i+((int) Math.round(Config.gridHeight*0.5)), theGrid);
             theGrid.addAgent(temp);
         }

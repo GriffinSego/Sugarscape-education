@@ -8,11 +8,14 @@ class Cell {
     private static SimplexNoise simplex = new SimplexNoise(100l);
     //instance variables
     private double sugar = Config.initialSugarValuePerTile;//initial value for sugar
+    private double spice = Config.initialSpiceValuePerTile;//initial value for sugar
     public boolean occupied = false;
     public Agent occupier;
     public boolean isCorpse = false;
+    public double decomposition = 0.0;
     private final double regenRate = Config.regenRate;
     private double noise;
+    private double spiceNoise;
     protected Cell(boolean occupied, double sugar) {
         this.occupied = occupied;
         this.sugar = sugar;
@@ -23,15 +26,27 @@ class Cell {
             occupied = true;
         }
         noise = Math.max(0,(simplex.noise(x, y)*Config.MAX_SUGAR)-(0.3*Config.MAX_SUGAR));
+        spiceNoise = Math.max(0,(simplex.noise(x+1000, y)*Config.MAX_SPICE)-(0.5*Config.MAX_SPICE));
     }
     public Cell(double x, double y) {
-        noise = Math.max(0,(simplex.noise(x, y)*Config.MAX_SUGAR)-(0.3*Config.MAX_SUGAR));
+        spiceNoise = Math.max(0,(simplex.noise(x+1000, y)*Config.MAX_SPICE)-(0.5*Config.MAX_SPICE));
     }
     public double getSugar(){
         return sugar;
     }
     public void setSugar(double newSugar){
         sugar = newSugar;
+    }
+    public double getSpice(){
+        return spice;
+    }
+    public void setSpice(double newSpice){
+        spice = newSpice;
+    }
+    public double eatSpice(){
+        double tempSpice = spice;
+        spice = 0;
+        return tempSpice;
     }
     public double eatSugar(){
         double tempSugar = sugar;
@@ -50,12 +65,27 @@ class Cell {
     }
     public void doTick(){
         if(!occupied){
-            this.sugar = Math.min(noise, this.sugar+regenRate);
+            this.sugar = (0.0001*Math.random())+
+            Math.min(noise, this.sugar+regenRate);
+            this.spice = (0.0001*Math.random())+
+            Math.min(noise,
+                this.spice+(regenRate/10));
         }else{
-            if(occupier.isDying){
+            if(occupier != null && occupier.isDying){
                 isCorpse = true;
             }else{
                 isCorpse = false;
+            }
+            if(isCorpse){
+                decomposition += Config.corpseDecayRate;
+                if(decomposition > 1.0){
+                    isCorpse = false;
+                    Grid.deadAgents.remove(occupier);
+                    Grid.livingAgents.remove(occupier);
+                    occupier = null;
+                    decomposition = 0;
+                    Grid.deaths++;
+                }
             }
         }
     }
@@ -66,6 +96,7 @@ public class Grid {
     public static ArrayList<Agent> livingAgents;
     public static ArrayList<Agent> deadAgents;
     //instance variables
+    public static int deaths;
     public boolean survivors = true;
     private final int w;
     private final int h;
@@ -108,14 +139,15 @@ public class Grid {
         for(int x=0;x<w;x++){
             for(int y=0;y<h;y++){
                 Cell cell = map[x][y];
-                if(cell.occupied){
+                if(cell.occupier != null){
                     if(cell.isCorpse){
                         newData[x][y] = Config.corpseColor;
                     }else{
                         newData[x][y] = Config.bodyColor;
                     }
                 }else if(cell.getSugar() > 1.0){
-                    newData[x][y] = new Pixel((int) (Math.round(25*cell.getSugar())));
+                    int tempValue = (int) Math.round(25*cell.getSugar());
+                    newData[x][y] = new Pixel(tempValue+(int) Math.round(Math.min(cell.getSpice()*255,255)), tempValue, tempValue);
                 }else{
                     newData[x][y] = new Pixel(0);
                 }
